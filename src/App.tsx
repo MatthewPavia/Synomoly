@@ -42,7 +42,16 @@ function App() {
     "That's not quite right!",
   ];
 
-  useEffect(() => getWord(), [])
+  useEffect(() => {
+    getWord()
+    let cache = localStorage.getItem("synomoly-"+getDate())
+    console.log(cache)
+    if(cache){
+      let results = JSON.parse(cache)
+      setResults(results)
+    }
+
+  }, [])
   useEffect(() => getSynonyms(), [word])
   useEffect(() => setGuesses(determineNumberOfSynonyms()+1), [synonyms])
   useEffect(() => {
@@ -94,8 +103,6 @@ function App() {
       method: 'GET',
       headers: headers
     };
-
-    console.log(word)
 
     if(word){
       fetch("https://api.api-ninjas.com/v1/thesaurus?word="+word, requestOptions)
