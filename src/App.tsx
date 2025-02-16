@@ -8,6 +8,7 @@ import { useDisclosure } from '@mantine/hooks';
 import ResultsModal from './components/ResultsModal';
 import PageTitle from './components/PageTitle';
 import { capitalizeFirstLetter } from './utils/StringUtils';
+import { errorPhrases, praisePhrases } from './utils/Phrases';
 
 function App() {
   const [word, setWord] = useState("")
@@ -18,33 +19,6 @@ function App() {
   const [hasAnswered, setHasAnswered] = useState(false)
 
   const [opened, { open, close }] = useDisclosure(false);
-
-  const praisePhrases = [
-    "Well done!",
-    "Nice work!",
-    "Great effort!",
-    "Excellent work!",
-    "Kudos!",
-    "Fantastic job!",
-    "Bravo!",
-    "Keep it up!",
-    "Awesome work!",
-    "Hats off to you!",
-    "Good job!",
-    "Thats right!"
-  ];
-
-  const errorPhrases = [
-    "That's incorrect!",
-    "Not quite!",
-    "That's wrong!",
-    "Try again!",
-    "That's off the mark!",
-    "Not exactly!",
-    "That's a mistake!",
-    "Oops, not correct!",
-    "That's not quite right!",
-  ];
 
   useEffect(() => {
     getWord()
@@ -146,9 +120,9 @@ function App() {
         <Text style={{color:"white"}} size="xl">{capitalizeFirstLetter(results[i])}</Text> 
         : 
         <Box
+          w={{ xs: "10rem", sm: "15rem", md:"30rem", lg: "30rem" }}
           style={{
             backgroundColor:"gray",
-            width:"30rem",
             height:"2rem",
             borderRadius:"7px"
         }}

@@ -62,7 +62,7 @@ function ResultsModal(props:ResultsModalProps) {
                 <Title style={{color:"white"}} order={1}>Game Summary</Title>
                 <Title style={{color:"white"}} order={6}>({props.date})</Title>
                 <Text style={{color:"white"}} size="md">Your score: {props.score}/{props.expectedResult}</Text>
-                <Text style={{color:"white"}} size="md">Possible answers: {props.possibleAnswers}</Text>
+                <Text fw={600} style={{color:"white"}} size="md">{props.possibleAnswers} possible answers</Text>
                 <ScrollArea h={250}>
                         {props.possibleSynonyms.map(x => <Text style={{color:"white"}}>{capitalizeFirstLetter(x)}</Text>)}
                 </ScrollArea>
