@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import words from '../resources/words.json'
-import { Title, Text, TextInput, Container, Space, Box, Stack, Flex, Group, ActionIcon, Modal, Button } from '@mantine/core';
+import { Title, Text, TextInput, Space, Box, Stack, Flex, Group, ActionIcon, Button } from '@mantine/core';
 import { IconArrowBigRightFilled } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
@@ -107,14 +107,6 @@ function App() {
   }
 
   const getSynonyms = () => {
-
-    let headers = new Headers();
-    headers.append("X-Api-Key", "Sicb+W4Svaz0NDH8eiEimg==GHiHSZtLpoSNS9A4");
-
-    var requestOptions = {
-      method: 'GET',
-      headers: headers
-    };
 
     if(word){
       //fetch("https://api.api-ninjas.com/v1/thesaurus?word="+word, requestOptions)
