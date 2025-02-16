@@ -49,7 +49,7 @@ function ResultsModal(props:ResultsModalProps) {
         <Modal 
             color="red" 
             opened={props.isOpen} 
-            onClose={() => close()}
+            onClose={() => props.onClose()}
             withCloseButton={false}
             centered 
             styles={{
