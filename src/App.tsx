@@ -61,7 +61,8 @@ function App() {
       setGuesses(0) 
     }
     else{
-      setGuesses(determineNumberOfSynonyms()+1) 
+      let numOfSynonyms = determineNumberOfSynonyms()
+      setGuesses(numOfSynonyms+Math.floor((numOfSynonyms/2))) 
     }
   }, [synonyms])
   useEffect(() => {
