@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import words from '../resources/words.json'
-import { Title, Text, TextInput, Space, Box, Stack, Flex, Group, ActionIcon, Button, Affix, Loader } from '@mantine/core';
+import { Title, Text, TextInput, Space, Box, Stack, Flex, Group, ActionIcon, Button, Affix } from '@mantine/core';
 import { IconArrowBigRightFilled, IconInfoCircle } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';

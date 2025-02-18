@@ -1,5 +1,4 @@
-import { Modal, ScrollArea, Stack, Text, Title } from "@mantine/core";
-import { capitalizeFirstLetter } from "../utils/StringUtils";
+import { Modal } from "@mantine/core";
 import React from "react";
 
 interface SimpleModalProps{
