@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import words from '../resources/words.json'
-import { Title, Text, TextInput, Space, Box, Stack, Flex, Group, ActionIcon, Button } from '@mantine/core';
-import { IconArrowBigRightFilled } from '@tabler/icons-react';
+import { Title, Text, TextInput, Space, Box, Stack, Flex, Group, ActionIcon, Button, Affix, Loader } from '@mantine/core';
+import { IconArrowBigRightFilled, IconInfoCircle } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useDisclosure } from '@mantine/hooks';
 import ResultsModal from './components/ResultsModal';
 import PageTitle from './components/PageTitle';
 import { capitalizeFirstLetter } from './utils/StringUtils';
 import { errorPhrases, praisePhrases } from './utils/Phrases';
+import SimpleModal from './components/SimpleModal';
+import { generate } from "random-words";
 
 function App() {
   const [word, setWord] = useState("")
@@ -18,7 +20,8 @@ function App() {
   const [guesses, setGuesses] = useState(0)
   const [hasAnswered, setHasAnswered] = useState(false)
 
-  const [opened, { open, close }] = useDisclosure(false);
+  const [resultOpened, { open:openResult, close:CloseResult }] = useDisclosure(false);
+  const [infoOpened, { toggle:toggleInfo }] = useDisclosure(false);
 
   useEffect(() => {
     getWord()
@@ -26,7 +29,7 @@ function App() {
     if(cache){
       let results = JSON.parse(cache)
       setResults(results)
-      open()
+      openResult()
     }
   }, [])
   useEffect(() => getSynonyms(), [word])
@@ -36,7 +39,7 @@ function App() {
     }
     else{
       let numOfSynonyms = determineNumberOfSynonyms()
-      setGuesses(numOfSynonyms+Math.floor((numOfSynonyms/2))) 
+      setGuesses(numOfSynonyms+Math.floor((numOfSynonyms/1.5))) 
     }
   }, [synonyms])
   useEffect(() => {
@@ -45,12 +48,12 @@ function App() {
     if(results.length === winningCount && winningCount > 0){
       localStorage.setItem("synomoly-"+getDate(), JSON.stringify(results))
 
-      open()
+      openResult()
     }
     else if(guesses === 0 && hasAnswered){
       localStorage.setItem("synomoly-"+getDate(), JSON.stringify(results))
       
-      open()
+      openResult()
     } 
   }, [guesses])
 
@@ -64,9 +67,15 @@ function App() {
   }
 
   const getWord = () => {
-    let date : string = getDate()
+    let word:string = ""
+    let date:string = getDate()
     const foundObject = words.filter(item => item[date as keyof typeof item])[0];
-    const word = Object.values(foundObject)[0]
+    if(foundObject){
+      word = Object.values(foundObject)[0]
+    }
+    else{
+      word = generate() as string
+    }
     setWord(word)
   }
 
@@ -84,7 +93,6 @@ function App() {
   const getSynonyms = () => {
 
     if(word){
-      //fetch("https://api.api-ninjas.com/v1/thesaurus?word="+word, requestOptions)
       fetch("https://www.dictionaryapi.com/api/v3/references/thesaurus/json/"+word+"?key=76f70900-a565-442e-8e17-5d43e5a3bda0")
       .then(x => x.json())
       .then(y => {console.log(y[0].meta.syns.flat());setSynonyms(y[0].meta.syns.flat())})
@@ -101,13 +109,10 @@ function App() {
       return length -1
     }
     else if(length <= 10){
-      return length
-    }
-    else if(length <= 20){
-      return Math.floor(length/2)
+      return length/2
     }
     else{
-      return 10
+      return 5
     }
   }
 
@@ -183,7 +188,7 @@ function App() {
 
   const giveUp = () => {
     localStorage.setItem("synomoly-"+getDate(), JSON.stringify(results))
-    open()
+    openResult()
   }
 
   const pickRandom = (array : Array<string>) => {
@@ -195,8 +200,8 @@ function App() {
   return (
     <>
       <ResultsModal
-        isOpen={opened}
-        onClose={close}
+        isOpen={resultOpened}
+        onClose={CloseResult}
         date={getDate()}
         score={results.length}
         expectedResult={determineNumberOfSynonyms()}
@@ -204,8 +209,27 @@ function App() {
         possibleSynonyms={synonyms}
       />
 
-      <Flex gap={"lg"} style={{backgroundColor:"#242424"}} align={"center"} direction={"column"}>
-        
+      <SimpleModal
+        isOpen={infoOpened}
+        onClose={toggleInfo}
+      >
+        <Stack>
+          <Title order={2}>About Synomoly 📖</Title>
+          <Text style={{color:"white"}}>Synomoly is a daily game meant to test your English language knowledge!</Text>
+          <Text style={{color:"white"}}>All synonyms provided by Merriam-Webster's Collegiate® Dictionary</Text>
+
+          <Title order={4}>Think outside the box!</Title>
+          <Text style={{color:"white"}}>Choose synonyms for all definitions of a word. For example, "Slow" can mean "sluggish" but also mean slow as in "dumb".</Text>
+        </Stack>
+      </SimpleModal>
+
+      <Affix position={{ top: 20, right: 60 }}>
+        <ActionIcon onClick={toggleInfo} color='white' size="xl" variant='subtle'>
+          <IconInfoCircle/>
+        </ActionIcon>
+      </Affix>
+      
+      <Flex gap={"lg"} style={{backgroundColor:"#242424"}} align={"center"} direction={"column"}>       
         <PageTitle/>
 
         <Stack
@@ -224,17 +248,17 @@ function App() {
           p="10px"
         >
           {renderForms()}
-          <Text p={"1rem"} size="sm" style={{color:"white"}}>Guesses left: {guesses}</Text>
+          <Text p={"1rem"} size="sm" style={{color:"white"}}>Guesses left: {isTodayComplete() ? 0 : guesses}</Text>
         </Stack>
         <Space h="md" />
         <Stack>
           <Group>
-            <TextInput disabled={guesses<1} onKeyDown={event => { if (event.key === 'Enter') { submitWord() } }} value={input} id="input" onChange={e => setInput(e.target.value)} placeholder="Write a synonym" size="lg" />
-            <ActionIcon disabled={guesses<1} onClick={submitWord} size="lg" variant="default">
+            <TextInput disabled={guesses<1 || isTodayComplete()} onKeyDown={event => { if (event.key === 'Enter') { submitWord() } }} value={input} id="input" onChange={e => setInput(e.target.value)} placeholder="Write a synonym" size="lg" />
+            <ActionIcon disabled={guesses<1 || isTodayComplete()} onClick={submitWord} size="lg" variant="default">
               <IconArrowBigRightFilled/>
             </ActionIcon>
           </Group>
-          <Button onClick={giveUp} color='white' variant="subtle">Give up?</Button>
+          <Button  onClick={giveUp} color='white' variant="subtle">{isTodayComplete() ? "Result" : "Give up?"}</Button>
         </Stack>
       </Flex>    
     </>
