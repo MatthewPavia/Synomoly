@@ -93,7 +93,7 @@ function App() {
   const getSynonyms = () => {
 
     if(word){
-      fetch("https://www.dictionaryapi.com/api/v3/references/thesaurus/json/"+word+"?key=76f70900-a565-442e-8e17-5d43e5a3bda0")
+      fetch("https://www.dictionaryapi.com/api/v3/references/thesaurus/json/"+word+"?key="+import.meta.env.VITE_API_KEY)
       .then(x => x.json())
       .then(y => {console.log(y[0].meta.syns.flat());setSynonyms(y[0].meta.syns.flat())})
     }
